@@ -28,7 +28,17 @@ export const IngredientDetails: FC = () => {
   if (error) return <div>Ошибка загрузки ингредиентов</div>;
   if (!ingredientData) return <div>Ингредиент не найден</div>;
 
-  const content = <IngredientDetailsUI ingredientData={ingredientData} />;
+  const content = (
+    <>
+      <h2
+        className='text text_type_main-large mt-10 mb-6'
+        style={{ textAlign: 'center' }}
+      >
+        Детали ингредиента
+      </h2>
+      <IngredientDetailsUI ingredientData={ingredientData} />
+    </>
+  );
 
   return isModal ? (
     content
