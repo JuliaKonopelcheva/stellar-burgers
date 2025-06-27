@@ -1,20 +1,53 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAppSelector } from '../../services/hooks';
+import { useAppDispatch, useAppSelector } from '../../services/hooks';
+import { fetchFeedOrders } from '../../services/slices/feed-slice';
+import { fetchProfileOrders } from '../../services/slices/profile-orders-slice';
+import { fetchIngredients } from '../../services/slices/ingredients-slice';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
 
 export const OrderInfo: FC = () => {
+  const dispatch = useAppDispatch();
   const { number } = useParams<{ number: string }>();
 
-  // Заказы
   const feedOrders = useAppSelector((state) => state.feed.orders);
-  const profileOrders = useAppSelector((state) => state.profileOrders.orders);
-  // Ингридиенты
-  const ingredients = useAppSelector((state) => state.ingredients.items);
+  const feedLoading = useAppSelector((state) => state.feed.loading);
+  const feedError = useAppSelector((state) => state.feed.error);
 
-  // Поиск заказа по номеру
+  const profileOrders = useAppSelector((state) => state.profileOrders.orders);
+  const profileLoading = useAppSelector((state) => state.profileOrders.loading);
+  const profileError = useAppSelector((state) => state.profileOrders.error);
+
+  const ingredients = useAppSelector((state) => state.ingredients.items);
+  const ingredientsLoading = useAppSelector(
+    (state) => state.ingredients.ingredientsRequest
+  );
+  const ingredientsError = useAppSelector(
+    (state) => state.ingredients.ingredientsFailed
+  );
+
+  const isAuth = useAppSelector((state) => !!state.auth.user);
+
+  useEffect(() => {
+    if (feedOrders.length === 0) {
+      dispatch(fetchFeedOrders());
+    }
+    if (isAuth && profileOrders.length === 0) {
+      dispatch(fetchProfileOrders());
+    }
+    if (ingredients.length === 0) {
+      dispatch(fetchIngredients());
+    }
+  }, [
+    dispatch,
+    feedOrders.length,
+    profileOrders.length,
+    ingredients.length,
+    isAuth
+  ]);
+
   const orderData = useMemo(() => {
     const num = Number(number);
     return (
@@ -23,7 +56,6 @@ export const OrderInfo: FC = () => {
     );
   }, [number, feedOrders, profileOrders]);
 
-  // Данные для отображения
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
 
@@ -63,6 +95,11 @@ export const OrderInfo: FC = () => {
       total
     };
   }, [orderData, ingredients]);
+
+  if (feedLoading || profileLoading || ingredientsLoading) return <Preloader />;
+  if (feedError || profileError || ingredientsError)
+    return <div>Ошибка загрузки данных</div>;
+  if (!orderData) return <div>Заказ не найден</div>;
 
   if (!orderInfo) {
     return <Preloader />;

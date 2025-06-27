@@ -42,7 +42,7 @@ const App = () => {
   return (
     <div className={styles.app}>
       <AppHeader />
-      <Routes location={location}>
+      <Routes location={state?.backgroundLocation || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
         <Route
@@ -69,36 +69,46 @@ const App = () => {
           path='/profile/orders'
           element={<ProtectedRoute component={<ProfileOrders />} />}
         />
-        <Route
-          path='/feed/:number'
-          element={
-            <Modal title='' onClose={handleModalClose}>
-              <OrderInfo />
-            </Modal>
-          }
-        />
-        <Route
-          path='/ingredients/:id'
-          element={
-            <Modal title='' onClose={handleModalClose}>
-              <IngredientDetails />
-            </Modal>
-          }
-        />
+        <Route path='/feed/:number' element={<OrderInfo />} />
+        <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route
           path='/profile/orders/:number'
-          element={
-            <ProtectedRoute
-              component={
-                <Modal title='' onClose={handleModalClose}>
-                  <OrderInfo />
-                </Modal>
-              }
-            />
-          }
+          element={<ProtectedRoute component={<OrderInfo />} />}
         />
         <Route path='*' element={<NotFound404 />} />
       </Routes>
+      {state?.backgroundLocation && (
+        <Routes>
+          <Route
+            path='/feed/:number'
+            element={
+              <Modal title='' onClose={handleModalClose}>
+                <OrderInfo />
+              </Modal>
+            }
+          />
+          <Route
+            path='/ingredients/:id'
+            element={
+              <Modal title='' onClose={handleModalClose}>
+                <IngredientDetails />
+              </Modal>
+            }
+          />
+          <Route
+            path='/profile/orders/:number'
+            element={
+              <ProtectedRoute
+                component={
+                  <Modal title='' onClose={handleModalClose}>
+                    <OrderInfo />
+                  </Modal>
+                }
+              />
+            }
+          />
+        </Routes>
+      )}
     </div>
   );
 };
