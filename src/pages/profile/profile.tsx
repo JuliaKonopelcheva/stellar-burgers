@@ -1,18 +1,21 @@
 import { ProfileUI } from '@ui-pages';
 import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../services/hooks';
+import { updateUser } from '../../services/slices/auth-slice';
 
 export const Profile: FC = () => {
-  /** TODO: взять переменную из стора */
-  const user = {
-    name: '',
-    email: ''
-  };
+  // Переменные из стора
+  const dispatch = useAppDispatch();
+  const { user, updateUserRequest, updateUserFailed } = useAppSelector(
+    (state) => state.auth
+  );
 
   const [formValue, setFormValue] = useState({
-    name: user.name,
-    email: user.email,
+    name: user?.name || '',
+    email: user?.email || '',
     password: ''
   });
+  const [error, setError] = useState('');
 
   useEffect(() => {
     setFormValue((prevState) => ({
@@ -22,6 +25,14 @@ export const Profile: FC = () => {
     }));
   }, [user]);
 
+  useEffect(() => {
+    if (updateUserFailed) {
+      setError('Ошибка обновления профиля');
+    } else {
+      setError('');
+    }
+  }, [updateUserFailed]);
+
   const isFormChanged =
     formValue.name !== user?.name ||
     formValue.email !== user?.email ||
@@ -29,15 +40,28 @@ export const Profile: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
+    if (!formValue.name || !formValue.email) {
+      setError('Заполните все поля');
+      return;
+    }
+    dispatch(
+      updateUser({
+        name: formValue.name,
+        email: formValue.email,
+        password: formValue.password || undefined
+      })
+    );
+    setFormValue((prev) => ({ ...prev, password: '' }));
   };
 
   const handleCancel = (e: SyntheticEvent) => {
     e.preventDefault();
     setFormValue({
-      name: user.name,
-      email: user.email,
+      name: user?.name || '',
+      email: user?.email || '',
       password: ''
     });
+    setError('');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
