@@ -1,5 +1,9 @@
 import { FC, ReactElement } from 'react';
 import { useAppSelector } from '../../services/hooks';
+import {
+  selectUser,
+  selectIsAuthChecked
+} from '../../services/slices/auth-slice';
 import { Navigate, useLocation } from 'react-router-dom';
 
 interface IProtectedRouteProps {
@@ -12,7 +16,8 @@ export const ProtectedRoute: FC<IProtectedRouteProps> = ({
   component
 }) => {
   // Данные о пользователе из Redux store
-  const { user, isAuthChecked } = useAppSelector((state) => state.auth);
+  const user = useAppSelector(selectUser);
+  const isAuthChecked = useAppSelector(selectIsAuthChecked);
   const location = useLocation();
 
   // Если проверка авторизации еще не завершена, рендер не происходит

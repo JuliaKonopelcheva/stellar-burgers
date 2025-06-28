@@ -2,23 +2,15 @@ import { FC, SyntheticEvent, useState, useEffect } from 'react';
 import { LoginUI } from '@ui-pages';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../services/hooks';
-import { loginUser } from '../../services/slices/auth-slice';
+import { loginUser, selectLoginFailed } from '../../services/slices/auth-slice';
 
 export const Login: FC = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const { user, loginFailed } = useAppSelector((state) => state.auth);
+  const loginFailed = useAppSelector(selectLoginFailed);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (user) {
-      setError('');
-      navigate('/');
-    }
-  }, [user, navigate]);
 
   useEffect(() => {
     if (loginFailed) {

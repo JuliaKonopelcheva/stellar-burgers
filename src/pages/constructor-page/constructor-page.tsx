@@ -1,6 +1,10 @@
 import { useEffect, FC } from 'react';
 import { useAppDispatch, useAppSelector } from '../../services/hooks';
 import { fetchIngredients } from '../../services/slices/ingredients-slice';
+import {
+  selectIngredientsRequest,
+  selectIngredientsFailed
+} from '../../services/slices/ingredients-slice';
 
 import styles from './constructor-page.module.css';
 
@@ -11,9 +15,8 @@ import { Preloader } from '../../components/ui';
 export const ConstructorPage: FC = () => {
   // Переменные из стора
   const dispatch = useAppDispatch();
-  const { ingredientsRequest, ingredientsFailed } = useAppSelector(
-    (state) => state.ingredients
-  );
+  const ingredientsRequest = useAppSelector(selectIngredientsRequest);
+  const ingredientsFailed = useAppSelector(selectIngredientsFailed);
 
   // Загрузка ингредиентов при первом рендере
   useEffect(() => {

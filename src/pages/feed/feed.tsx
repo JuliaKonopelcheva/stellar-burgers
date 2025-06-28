@@ -3,16 +3,25 @@ import { FeedUI } from '@ui-pages';
 import { TOrder } from '@utils-types';
 import { FC, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../services/hooks';
-import { fetchFeedOrders } from '../../services/slices/feed-slice';
-import { fetchIngredients } from '../../services/slices/ingredients-slice';
+import {
+  fetchFeedOrders,
+  selectFeedOrders,
+  selectFeedLoading,
+  selectFeedError
+} from '../../services/slices/feed-slice';
+import {
+  fetchIngredients,
+  selectIngredients
+} from '../../services/slices/ingredients-slice';
 
 export const Feed: FC = () => {
   // Переменные из стора
   const dispatch = useAppDispatch();
-  const { orders, loading, error } = useAppSelector((state) => state.feed);
-  const ingredientsLoaded = useAppSelector(
-    (state) => state.ingredients.items.length > 0
-  );
+  const orders = useAppSelector(selectFeedOrders);
+  const loading = useAppSelector(selectFeedLoading);
+  const error = useAppSelector(selectFeedError);
+  const ingredients = useAppSelector(selectIngredients);
+  const ingredientsLoaded = ingredients.length > 0;
 
   useEffect(() => {
     if (!ingredientsLoaded) {

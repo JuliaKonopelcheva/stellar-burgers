@@ -1,17 +1,28 @@
-import { useState, useRef, useEffect, FC } from 'react';
+import { useState, useRef, useEffect, FC, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 import { TTabMode } from '@utils-types';
 import { BurgerIngredientsUI } from '@ui';
 import { useAppSelector } from '../../services/hooks';
+import { selectIngredients } from '../../services/slices/ingredients-slice';
 
 export const BurgerIngredients: FC = () => {
   // Переменные из стора
-  const items = useAppSelector((state) => state.ingredients.items);
+  const items = useAppSelector(selectIngredients);
 
-  const buns = items.filter((item) => item.type === 'bun');
-  const mains = items.filter((item) => item.type === 'main');
-  const sauces = items.filter((item) => item.type === 'sauce');
+  // Оптимизация фильтрации с помощью useMemo
+  const buns = useMemo(
+    () => items.filter((item) => item.type === 'bun'),
+    [items]
+  );
+  const mains = useMemo(
+    () => items.filter((item) => item.type === 'main'),
+    [items]
+  );
+  const sauces = useMemo(
+    () => items.filter((item) => item.type === 'sauce'),
+    [items]
+  );
 
   const [currentTab, setCurrentTab] = useState<TTabMode>('bun');
   const titleBunRef = useRef<HTMLHeadingElement>(null);

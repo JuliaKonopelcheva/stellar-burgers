@@ -1,13 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getOrdersApi } from '../../utils/burger-api';
 import { TOrder } from '../../utils/types';
+import { RootState } from '../store';
 
 export const fetchProfileOrders = createAsyncThunk(
   'profileOrders/fetchProfileOrders',
-  async () => {
-    const orders = await getOrdersApi();
-    return orders;
-  }
+  getOrdersApi
 );
 
 interface IProfileOrdersState {
@@ -42,5 +40,13 @@ const profileOrdersSlice = createSlice({
       });
   }
 });
+
+// Селекторы
+export const selectProfileOrders = (state: RootState) =>
+  state.profileOrders.orders;
+export const selectProfileOrdersLoading = (state: RootState) =>
+  state.profileOrders.loading;
+export const selectProfileOrdersError = (state: RootState) =>
+  state.profileOrders.error;
 
 export default profileOrdersSlice.reducer;

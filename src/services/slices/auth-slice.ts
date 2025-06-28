@@ -5,6 +5,7 @@ import {
   registerUserApi,
   updateUserApi
 } from '../../utils/burger-api';
+import { RootState } from '../store';
 
 // Интерфейс для пользователя
 interface IUser {
@@ -87,7 +88,7 @@ const authSlice = createSlice({
     // Обработка проверки авторизации
     builder
       .addCase(checkUserAuth.pending, (state) => {
-        state.isAuthChecked = true;
+        state.isAuthChecked = false;
       })
       .addCase(checkUserAuth.fulfilled, (state, action) => {
         state.user = action.payload;
@@ -138,6 +139,21 @@ const authSlice = createSlice({
       });
   }
 });
+
+// Селекторы
+export const selectUser = (state: RootState) => state.auth.user;
+export const selectIsAuthChecked = (state: RootState) =>
+  state.auth.isAuthChecked;
+export const selectLoginRequest = (state: RootState) => state.auth.loginRequest;
+export const selectLoginFailed = (state: RootState) => state.auth.loginFailed;
+export const selectRegisterRequest = (state: RootState) =>
+  state.auth.registerRequest;
+export const selectRegisterFailed = (state: RootState) =>
+  state.auth.registerFailed;
+export const selectUpdateUserRequest = (state: RootState) =>
+  state.auth.updateUserRequest;
+export const selectUpdateUserFailed = (state: RootState) =>
+  state.auth.updateUserFailed;
 
 // Экспорт actions и reducer
 export const { logout } = authSlice.actions;

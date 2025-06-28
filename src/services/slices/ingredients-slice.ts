@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getIngredientsApi } from '../../utils/burger-api';
 import { TIngredient } from '../../utils/types';
+import { RootState } from '../store';
 
 // Тип состояния слайса ингредиентов
 interface IIngredientsState {
@@ -19,10 +20,7 @@ const initialState: IIngredientsState = {
 // Асинхронный thunk для получения ингредиентов с сервера
 export const fetchIngredients = createAsyncThunk(
   'ingredients/fetchIngredients',
-  async () => {
-    const response = await getIngredientsApi();
-    return response;
-  }
+  getIngredientsApi
 );
 
 // Слайс для ингредиентов
@@ -48,6 +46,13 @@ const ingredientsSlice = createSlice({
     });
   }
 });
+
+// Селекторы
+export const selectIngredients = (state: RootState) => state.ingredients.items;
+export const selectIngredientsRequest = (state: RootState) =>
+  state.ingredients.ingredientsRequest;
+export const selectIngredientsFailed = (state: RootState) =>
+  state.ingredients.ingredientsFailed;
 
 // Экспорт редьюсера
 export default ingredientsSlice.reducer;

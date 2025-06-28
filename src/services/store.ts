@@ -6,12 +6,6 @@ import orderReducer from './slices/order-slice';
 import profileOrdersReducer from './slices/profile-orders-slice';
 import feedReducer from './slices/feed-slice';
 
-import {
-  TypedUseSelectorHook,
-  useDispatch as dispatchHook,
-  useSelector as selectorHook
-} from 'react-redux';
-
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -28,8 +22,5 @@ export const store = configureStore({
 // Типы для RootState и AppDispatch
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
-export const useAppDispatch = () => dispatchHook<AppDispatch>();
-export const useAppSelector: TypedUseSelectorHook<RootState> = selectorHook;
 
 export default store;
