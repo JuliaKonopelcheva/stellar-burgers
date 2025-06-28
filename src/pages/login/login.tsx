@@ -1,15 +1,25 @@
-import { FC, SyntheticEvent, useState, useEffect } from 'react';
+import {
+  FC,
+  SyntheticEvent,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction
+} from 'react';
 import { LoginUI } from '@ui-pages';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../services/hooks';
+import { useAppDispatch, useAppSelector, useForm } from '../../services/hooks';
 import { loginUser, selectLoginFailed } from '../../services/slices/auth-slice';
 
 export const Login: FC = () => {
   const dispatch = useAppDispatch();
   const loginFailed = useAppSelector(selectLoginFailed);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formValue, handleInputChange, setFieldValue] = useForm({
+    email: '',
+    password: ''
+  });
+
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -20,26 +30,36 @@ export const Login: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!formValue.email || !formValue.password) {
       setError('Заполните все поля');
       return;
     }
-    dispatch(loginUser({ email, password }));
+    dispatch(
+      loginUser({ email: formValue.email, password: formValue.password })
+    );
+  };
+
+  const setEmail: Dispatch<SetStateAction<string>> = (value) => {
+    const newValue =
+      typeof value === 'function' ? value(formValue.email) : value;
+    setFieldValue('email', newValue);
+    if (error) setError('');
+  };
+
+  const setPassword: Dispatch<SetStateAction<string>> = (value) => {
+    const newValue =
+      typeof value === 'function' ? value(formValue.password) : value;
+    setFieldValue('password', newValue);
+    if (error) setError('');
   };
 
   return (
     <LoginUI
       errorText={error}
-      email={email}
-      setEmail={(value) => {
-        setEmail(value);
-        if (error) setError('');
-      }}
-      password={password}
-      setPassword={(value) => {
-        setPassword(value);
-        if (error) setError('');
-      }}
+      email={formValue.email}
+      setEmail={setEmail}
+      password={formValue.password}
+      setPassword={setPassword}
       handleSubmit={handleSubmit}
     />
   );
