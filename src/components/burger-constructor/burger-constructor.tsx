@@ -1,43 +1,74 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
+import { useAppSelector, useAppDispatch } from '../../services/hooks';
+import { createOrder, clearOrder } from '../../services/slices/order-slice';
+import { clearConstructor } from '../../services/slices/burger-constructor-slice';
 
 export const BurgerConstructor: FC = () => {
-  /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const constructorItems = {
-    bun: {
-      price: 0
-    },
-    ingredients: []
-  };
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const orderRequest = false;
+  // Состояние конструктора из Redux store
+  const { bun, ingredients } = useAppSelector(
+    (state) => state.burgerConstructor
+  );
 
-  const orderModalData = null;
+  // Состояние заказа и авторизации
+  const { orderRequest, order } = useAppSelector((state) => state.order);
+  const { user } = useAppSelector((state) => state.auth);
 
+  // Обработчик клика по кнопке "Оформить заказ"
   const onOrderClick = () => {
-    if (!constructorItems.bun || orderRequest) return;
-  };
-  const closeOrderModal = () => {};
+    if (!bun || orderRequest) return;
 
+    // Если пользователь не авторизован, перенаправление на страницу входа
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    // Массив ID ингредиентов для заказа
+    const ingredientIds = [
+      bun._id,
+      ...(ingredients || []).map((item) => item._id),
+      bun._id
+    ];
+
+    // Отправление заказа
+    dispatch(createOrder(ingredientIds));
+  };
+
+  // Закрытие модального окна с заказом
+  const closeOrderModal = () => {
+    dispatch(clearOrder());
+  };
+
+  // Подсчет общей стоимости заказа
   const price = useMemo(
     () =>
-      (constructorItems.bun ? constructorItems.bun.price * 2 : 0) +
-      constructorItems.ingredients.reduce(
+      (bun ? bun.price * 2 : 0) +
+      (ingredients || []).reduce(
         (s: number, v: TConstructorIngredient) => s + v.price,
         0
       ),
-    [constructorItems]
+    [bun, ingredients]
   );
 
-  return null;
+  // Очищение конструктора после успешного заказа
+  useEffect(() => {
+    if (order) {
+      dispatch(clearConstructor());
+    }
+  }, [order, dispatch]);
 
   return (
     <BurgerConstructorUI
       price={price}
       orderRequest={orderRequest}
-      constructorItems={constructorItems}
-      orderModalData={orderModalData}
+      constructorItems={{ bun, ingredients: ingredients || [] }}
+      orderModalData={order}
       onOrderClick={onOrderClick}
       closeOrderModal={closeOrderModal}
     />

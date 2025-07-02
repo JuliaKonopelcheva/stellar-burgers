@@ -1,26 +1,46 @@
 import { ProfileUI } from '@ui-pages';
-import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import {
+  FC,
+  SyntheticEvent,
+  useEffect,
+  useState,
+  Dispatch,
+  SetStateAction
+} from 'react';
+import { useAppDispatch, useAppSelector, useForm } from '../../services/hooks';
+import {
+  updateUser,
+  selectUser,
+  selectUpdateUserRequest,
+  selectUpdateUserFailed
+} from '../../services/slices/auth-slice';
 
 export const Profile: FC = () => {
-  /** TODO: взять переменную из стора */
-  const user = {
-    name: '',
-    email: ''
-  };
+  // Переменные из стора
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const updateUserRequest = useAppSelector(selectUpdateUserRequest);
+  const updateUserFailed = useAppSelector(selectUpdateUserFailed);
 
-  const [formValue, setFormValue] = useState({
-    name: user.name,
-    email: user.email,
+  const [formValue, handleInputChange, setFieldValue] = useForm({
+    name: user?.name || '',
+    email: user?.email || '',
     password: ''
   });
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    setFormValue((prevState) => ({
-      ...prevState,
-      name: user?.name || '',
-      email: user?.email || ''
-    }));
-  }, [user]);
+    setFieldValue('name', user?.name || '');
+    setFieldValue('email', user?.email || '');
+  }, [user, setFieldValue]);
+
+  useEffect(() => {
+    if (updateUserFailed) {
+      setError('Ошибка обновления профиля');
+    } else {
+      setError('');
+    }
+  }, [updateUserFailed]);
 
   const isFormChanged =
     formValue.name !== user?.name ||
@@ -29,22 +49,31 @@ export const Profile: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
+    if (!formValue.name || !formValue.email) {
+      setError('Заполните все поля');
+      return;
+    }
+    dispatch(
+      updateUser({
+        name: formValue.name,
+        email: formValue.email,
+        password: formValue.password || undefined
+      })
+    );
+    setFieldValue('password', '');
   };
 
   const handleCancel = (e: SyntheticEvent) => {
     e.preventDefault();
-    setFormValue({
-      name: user.name,
-      email: user.email,
-      password: ''
-    });
+    setFieldValue('name', user?.name || '');
+    setFieldValue('email', user?.email || '');
+    setFieldValue('password', '');
+    setError('');
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormValue((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value
-    }));
+  const handleInputChangeAdapter = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange(e);
+    if (error) setError('');
   };
 
   return (
@@ -53,9 +82,7 @@ export const Profile: FC = () => {
       isFormChanged={isFormChanged}
       handleCancel={handleCancel}
       handleSubmit={handleSubmit}
-      handleInputChange={handleInputChange}
+      handleInputChange={handleInputChangeAdapter}
     />
   );
-
-  return null;
 };
