@@ -4,21 +4,11 @@ import authReducer, {
   loginUser,
   registerUser,
   updateUser,
-  logout
+  logout,
+  initialState
 } from './auth-slice';
 
 describe('Auth Slice', () => {
-  const initialState = {
-    user: null,
-    isAuthChecked: false,
-    loginRequest: false,
-    loginFailed: false,
-    registerRequest: false,
-    registerFailed: false,
-    updateUserRequest: false,
-    updateUserFailed: false
-  };
-
   // Проверка состояния при checkUserAuth
   it('should handle checkUserAuth pending', () => {
     const action = { type: checkUserAuth.pending.type };

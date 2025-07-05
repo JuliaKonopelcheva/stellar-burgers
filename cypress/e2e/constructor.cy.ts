@@ -1,3 +1,17 @@
+// Селекторы
+const SELECTOR_INGREDIENT_BUN = '[data-testid="ingredient-bun"]';
+const SELECTOR_INGREDIENT_MAIN = '[data-testid="ingredient-main"]';
+const SELECTOR_INGREDIENT_SAUCE = '[data-testid="ingredient-sauce"]';
+const SELECTOR_CONSTRUCTOR_BUN_TOP = '[data-testid="constructor-bun-top"]';
+const SELECTOR_CONSTRUCTOR_BUN_BOTTOM = '[data-testid="constructor-bun-bottom"]';
+const SELECTOR_CONSTRUCTOR_INGREDIENTS = '[data-testid="constructor-ingredients"]';
+const SELECTOR_MODAL = '[data-testid="modal"]';
+const SELECTOR_MODAL_CLOSE = '[data-testid="modal-close"]';
+const SELECTOR_MODAL_OVERLAY = '[data-testid="modal-overlay"]';
+const SELECTOR_ORDER_BUTTON = '[data-testid="order-button"]';
+const SELECTOR_ORDER_MODAL = '[data-testid="order-modal"]';
+const SELECTOR_ORDER_NUMBER = '[data-testid="order-number"]';
+
 describe('Constructor Page', () => {
   beforeEach(() => {
     // Перехват запросов к API
@@ -33,13 +47,13 @@ describe('Constructor Page', () => {
   describe('Adding ingredients to constructor', () => {
     it('should add bun to constructor', () => {
       // Проверка добавления булки
-      cy.get('[data-testid="ingredient-bun"]').first().find('button').click();
+      cy.get(SELECTOR_INGREDIENT_BUN).first().find('button').click();
 
-      cy.get('[data-testid="constructor-bun-top"]').should(
+      cy.get(SELECTOR_CONSTRUCTOR_BUN_TOP).should(
         'contain',
         'Краторная булка N-200i'
       );
-      cy.get('[data-testid="constructor-bun-bottom"]').should(
+      cy.get(SELECTOR_CONSTRUCTOR_BUN_BOTTOM).should(
         'contain',
         'Краторная булка N-200i'
       );
@@ -47,8 +61,8 @@ describe('Constructor Page', () => {
 
     // Проверка добавления начинки
     it('should add main ingredient to constructor', () => {
-      cy.get('[data-testid="ingredient-main"]').first().find('button').click();
-      cy.get('[data-testid="constructor-ingredients"]').should(
+      cy.get(SELECTOR_INGREDIENT_MAIN).first().find('button').click();
+      cy.get(SELECTOR_CONSTRUCTOR_INGREDIENTS).should(
         'contain',
         'Филе Люминесцентного тетраодонтимформа'
       );
@@ -56,8 +70,8 @@ describe('Constructor Page', () => {
 
     // Проверка добавления соуса
     it('should add sauce to constructor', () => {
-      cy.get('[data-testid="ingredient-sauce"]').first().find('button').click();
-      cy.get('[data-testid="constructor-ingredients"]').should(
+      cy.get(SELECTOR_INGREDIENT_SAUCE).first().find('button').click();
+      cy.get(SELECTOR_CONSTRUCTOR_INGREDIENTS).should(
         'contain',
         'Соус фирменный Space Sauce'
       );
@@ -68,10 +82,10 @@ describe('Constructor Page', () => {
   describe('Modal windows', () => {
     // Открытие модального окна по клику на ингредиент
     it('should open ingredient modal when clicking on ingredient', () => {
-      cy.get('[data-testid="ingredient-main"]').first().click();
+      cy.get(SELECTOR_INGREDIENT_MAIN).first().click();
 
-      cy.get('[data-testid="modal"]').should('be.visible');
-      cy.get('[data-testid="modal"]').should(
+      cy.get(SELECTOR_MODAL).should('be.visible');
+      cy.get(SELECTOR_MODAL).should(
         'contain',
         'Филе Люминесцентного тетраодонтимформа'
       );
@@ -80,26 +94,26 @@ describe('Constructor Page', () => {
     // Закрытие модального окна по крестику
     it('should close ingredient modal when clicking on close button', () => {
       // Открытие модальное окно
-      cy.get('[data-testid="ingredient-main"]').first().click();
-      cy.get('[data-testid="modal"]').should('be.visible');
+      cy.get(SELECTOR_INGREDIENT_MAIN).first().click();
+      cy.get(SELECTOR_MODAL).should('be.visible');
 
       // Закрытие модального окна
-      cy.get('[data-testid="modal-close"]').click();
+      cy.get(SELECTOR_MODAL_CLOSE).click();
 
       // Проверка, что модальное окно закрылось
-      cy.get('[data-testid="modal"]').should('not.exist');
+      cy.get(SELECTOR_MODAL).should('not.exist');
     });
 
     it('should close ingredient modal when clicking on overlay', () => {
       // Открытие модальное окно
-      cy.get('[data-testid="ingredient-main"]').first().click();
-      cy.get('[data-testid="modal"]').should('be.visible');
+      cy.get(SELECTOR_INGREDIENT_MAIN).first().click();
+      cy.get(SELECTOR_MODAL).should('be.visible');
 
       // Закрытие модального окна кликом по оверлею
-      cy.get('[data-testid="modal-overlay"]').click({ force: true });
+      cy.get(SELECTOR_MODAL_OVERLAY).click({ force: true });
 
       // Проверка, что модальное окно закрылось
-      cy.get('[data-testid="modal"]').should('not.exist');
+      cy.get(SELECTOR_MODAL).should('not.exist');
     });
   });
 
@@ -107,32 +121,32 @@ describe('Constructor Page', () => {
   describe('Order creation', () => {
     it('should create order successfully', () => {
       // Добавление булки
-      cy.get('[data-testid="ingredient-bun"]').first().find('button').click();
+      cy.get(SELECTOR_INGREDIENT_BUN).first().find('button').click();
 
       // Добавление начинки
-      cy.get('[data-testid="ingredient-main"]').first().find('button').click();
+      cy.get(SELECTOR_INGREDIENT_MAIN).first().find('button').click();
 
       // Кнопка "Оформить заказ"
-      cy.get('[data-testid="order-button"]').click();
+      cy.get(SELECTOR_ORDER_BUTTON).click();
 
       // Ждем создания заказа
       cy.wait('@createOrder');
 
       // Проверка, что модальное окно заказа открылось
-      cy.get('[data-testid="order-modal"]').should('be.visible');
-      cy.get('[data-testid="order-number"]').should('contain', '12345');
+      cy.get(SELECTOR_ORDER_MODAL).should('be.visible');
+      cy.get(SELECTOR_ORDER_NUMBER).should('contain', '12345');
 
       // Закрытие модального окна
-      cy.get('[data-testid="modal-close"]').click();
-      cy.get('[data-testid="order-modal"]').should('not.exist');
+      cy.get(SELECTOR_MODAL_CLOSE).click();
+      cy.get(SELECTOR_ORDER_MODAL).should('not.exist');
 
       // Проверка, что конструктор очистился
-      cy.get('[data-testid="constructor-ingredients"]').should(
+      cy.get(SELECTOR_CONSTRUCTOR_INGREDIENTS).should(
         'contain',
         'Выберите начинку'
       );
-      cy.get('[data-testid="constructor-bun-top"]').should('not.exist');
-      cy.get('[data-testid="constructor-bun-bottom"]').should('not.exist');
+      cy.get(SELECTOR_CONSTRUCTOR_BUN_TOP).should('not.exist');
+      cy.get(SELECTOR_CONSTRUCTOR_BUN_BOTTOM).should('not.exist');
     });
   });
 });
