@@ -26,7 +26,7 @@ interface IAuthState {
 }
 
 // Начальное состояние
-const initialState: IAuthState = {
+export const initialState: IAuthState = {
   user: null,
   isAuthChecked: false,
   loginRequest: false,
